@@ -1,0 +1,32 @@
+services:
+  backend-flask:
+    build:
+      context: ./backend-flask
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend-flask:/app
+      - /app/node_modules
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_API_URL=http://34.30.69.88:4000 # Replace with actual IP
+    ports:
+      - "80:80" # Changed to port 80 for Nginx
+    depends_on:
+      - backend-flask
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
